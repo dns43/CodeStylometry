@@ -1,6 +1,6 @@
 public enum Loops {
-
-	forLoop("for"), doWhileLoop("do"), whileLoop("while");
+        //dns43: added forIn for JavaScript, will always be empty in C, is that a problem?
+	forLoop("for"), doWhileLoop("do"), whileLoop("while"), forInLoop("in");
 
 	private final String name;
 

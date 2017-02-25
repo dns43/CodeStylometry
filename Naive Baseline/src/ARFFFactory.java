@@ -14,7 +14,12 @@ public class ARFFFactory {
 		AbstractExtractor x = null;
 		if (f.getName().matches(".*\\.cpp")) {
 			x = new ExtractorCPP(f);
-		} else {
+		}
+                else if (f.getName().matches(".*\\.js")) {
+                        //dns43: introducing a new class )implements AbstractExtractor
+			x = new ExtractorJS(f);
+                //dns43: undocumented feature: uses C as default language
+		}else {
 			x = new ExtractorC(f);
 		}
 		return x;
@@ -70,8 +75,10 @@ public class ARFFFactory {
 				if (myFile.isDirectory()) {
 					files.add(myFile);
 				} else if (myFile.isFile()) {
+                                    //dns43: at this point the code adds files of different types...
 					if (myFile.getName().matches(".*\\.c")
-							|| myFile.getName().matches(".*\\.cpp")) {
+							|| myFile.getName().matches(".*\\.cpp")
+                                                        || myFile.getName().matches(".*\\.js")){
 						programs.add(myFile);
 					}
 				}

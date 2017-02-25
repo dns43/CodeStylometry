@@ -19,6 +19,7 @@ import java.util.Stack;
 public abstract class AbstractExtractor implements FeatureSet {
 
 	private File file;
+        //dns43: tokenDelimiter does not escape | properly, might be read as OR
 	static String tokenDelimiter = "[*;\\{\\}\\[\\]()+=\\-&/|%!?:,<>~`\\s\"]";
 	MultiSet<String> literals;
 	List<String> commentList;
@@ -65,6 +66,8 @@ public abstract class AbstractExtractor implements FeatureSet {
 				this.commentList.add(readNextComment(source));
 			} else {
 				// read in the code until after the next delimiter
+                                //dns43: if next char is delimiter, keep reading
+                                //dns43: ... so it acutally deletes the delimiters, right?!
 				readUntilNextToken(source, sink);
 			}
 		}
