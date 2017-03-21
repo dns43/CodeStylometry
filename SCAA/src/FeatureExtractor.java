@@ -41,10 +41,11 @@ public class FeatureExtractor {
 //       	String output_filename = "/Users/Aylin/Desktop/Drexel/2014/ARLInternship/SCAAarffs/incremental/" +"CodeJam_14FilesPerAuthor_2014_"+ (month+1) + "." + 
 //    	dayOfMonth + "_"+ time +".arff" ;
        	for(int numberFiles=2; numberFiles<4; numberFiles++){
-    	String output_filename = "/Users/Aylin/Desktop/Drexel/2014/ARLInternship/SCAAarffs/"
-    			+ "mallory_150/SFS/" +"mallory_SFS_"+numberFiles+".arff" ;
-		String test_dir = "/Users/Aylin/Desktop/Drexel/2014/ARLInternship/SCAA_Datasets/forMallory/mallory_new_SFS/malloryDataset_"+numberFiles+"/";
-
+    	//dns43: replace those paths by my own ones
+        //String output_filename = "/Users/Aylin/Desktop/Drexel/2014/ARLInternship/SCAAarffs/"
+    	//		+ "mallory_150/SFS/" +"mallory_SFS_"+numberFiles+".arff" ;
+              String output_filename = "C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\astfiles\\protobuf.arff";
+	      String test_dir ="C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\astfiles\\";
        	List test_file_paths = Util.listTextFiles(test_dir);
 
 	String text = "";
@@ -69,15 +70,18 @@ public class FeatureExtractor {
 
 //	Util.writeFile("@attribute 'AverageASTDepth' numeric"+"\n", output_filename, true);
 
-	
+    //dns43: matches .txt and .doc files in test_dir unique patterns matching "u'(.*?)'", what ever that means
     String[] APIsymbols = FeatureCalculators.uniqueAPISymbols(test_dir);
     //uniqueASTTypes does not contain user input, such as function and variable names
     //uniqueDepASTTypes contain user input, such as function and variable names
     
 //Use the following for syntactic inner nodes and code leaves (remember to change astlabel.py accordingly!
-       String[] ASTtypes =FeatureCalculators.uniqueDepASTTypes(test_dir);
+       //dns43: matches .dep files in test_dir for unique patterns matching regex "([\\w']+)"
+       String[] ASTtypes = FeatureCalculators.uniqueDepASTTypes(test_dir);
+       //dns43: matches .cpp files for everything that appears only once (whitespace as seperator)
        String[] wordUnigramsCPP =FeatureCalculators.wordUnigramsCPP(test_dir);
-      	String[] ASTNodeBigrams = BigramExtractor.getASTNodeBigrams(test_dir);
+      //dns43: auskommentiert weil scheiße	
+       String[] ASTNodeBigrams = BigramExtractor.getASTNodeBigrams(test_dir);
     	
 
     //if only interested in syntactic features use this if the dep file contains user input    
@@ -94,10 +98,11 @@ public class FeatureExtractor {
 /*    for (int i=0; i<ASTtypes.length; i++)	
     {	Util.writeFile("@attribute 'ASTtypesTFIDF["+i+"]' numeric"+"\n", output_filename, true);}
 */
-      	
-    	for (int i=0; i<ASTNodeBigrams.length; i++)		
-  	  {  	ASTNodeBigrams[i] = ASTNodeBigrams[i].replace("'", "apostrophesymbol");
-  	    	Util.writeFile("@attribute 'ASTNodeBigramsTF "+i+"=["+ASTNodeBigrams[i]+"]' numeric"+"\n", output_filename, true);}
+//dns43: auskommentiert weil scheiße
+//        System.out.print(ASTNodeBigrams.length);
+//    	for (int i=0; i<ASTNodeBigrams.length; i++)		
+//  	  {  	ASTNodeBigrams[i] = ASTNodeBigrams[i].replace("'", "apostrophesymbol");
+//  	    	Util.writeFile("@attribute 'ASTNodeBigramsTF "+i+"=["+ASTNodeBigrams[i]+"]' numeric"+"\n", output_filename, true);}
       
     	for (int i=0; i<wordUnigramsCPP.length; i++)	   	
        {  	wordUnigramsCPP[i] = wordUnigramsCPP[i].replace("'", "apostrophesymbol");
@@ -117,10 +122,15 @@ public class FeatureExtractor {
     for (int i=0; i<cppKeywords.length; i++)	
   {	Util.writeFile("@attribute 'cppKeyword "+i+"=["+cppKeywords[i]+"]' numeric"+"\n", output_filename, true);}
 
+    
+    //dns43: right now the header is written,
+    //dns43: now the label:
+    //dns43: here the authors for all of the files are written as once, as all paths are written in @InstanceID
     File authorFileName = null;
 	//Writing the classes (authorname)
 	Util.writeFile("@attribute 'authorName' {",output_filename, true);
-	for(int i=0; i< test_file_paths.size(); i++){
+        System.out.println(test_file_paths.size());
+	for(int i=0; i < test_file_paths.size(); i++){
 		int testIDlength = test_file_paths.get(i).toString().length();   
 		authorFileName= new File(test_file_paths.get(i).toString());
 		String authorName= authorFileName.getParentFile().getName();
@@ -134,7 +144,7 @@ public class FeatureExtractor {
 		   }
 		   words = uniqueWords.toArray(new String[0]);
 		   int authorCount = words.length;
-		   if (i+1==test_file_paths.size()){
+                   if (i+1==test_file_paths.size()){
 		   for (int j=0; j< authorCount; j++){
 			   {System.out.println(words[j]);
 				if(j+1 == authorCount)
@@ -173,7 +183,9 @@ public class FeatureExtractor {
 		Util.writeFile(FeatureCalculators.functionIDCount(featureText)+",", output_filename, true);
 		String ASTText = Util.readFile(test_file_paths.get(i).toString().substring(0,testIDlength-3)+"ast");
 		String DepASTText = Util.readFile(test_file_paths.get(i).toString().substring(0,testIDlength-3)+"dep");
-		String sourceCode = Util.readFile(test_file_paths.get(i).toString().substring(0,testIDlength-3)+"cpp");
+                //dns43: replace cpp with js
+                //String sourceCode = Util.readFile(test_file_paths.get(i).toString().substring(0,testIDlength-3)+"cpp");
+		String sourceCode = Util.readFile(test_file_paths.get(i).toString().substring(0,testIDlength-3)+"js");
 
 		Util.writeFile(FeatureCalculators.CFGNodeCount(ASTText)+",", output_filename, true);
 		Util.writeFile(FeatureCalculators.ASTFunctionIDCount(ASTText)+",", output_filename, true);
@@ -206,11 +218,12 @@ public class FeatureExtractor {
 	    for (int j=0; j<ASTtypes.length; j++)
 		{Util.writeFile(astTypeTFIDF[j]+",", output_filename, true);}	*/
 
-	    //get frequency of each ASTnodebigram in CPP source file's AST	 
-		float[] bigramCount = BigramExtractor.getASTNodeBigramsTF(DepASTText, ASTNodeBigrams );
-		for (int j=0; j<ASTNodeBigrams.length; j++)
-		{Util.writeFile(bigramCount[j] +",", output_filename, true);}	    
-		    
+	    //get frequency of each ASTnodebigram in CPP source file's AST	
+            //dns43: auskommentiert weil scheiße
+//		float[] bigramCount = BigramExtractor.getASTNodeBigramsTF(DepASTText, ASTNodeBigrams );
+//		for (int j=0; j<ASTNodeBigrams.length; j++)
+//		{Util.writeFile(bigramCount[j] +",", output_filename, true);}	    
+		System.out.println("j"); 
 	    //get count of each wordUnigram in CPP source file	 
 	    float[] wordUniCount = FeatureCalculators.WordUnigramTF(sourceCode, wordUnigramsCPP);
 	    for (int j=0; j<wordUniCount.length; j++)
@@ -272,13 +285,7 @@ public class FeatureExtractor {
 		   }
 		   words = uniqueWords.toArray(new String[0]);
 		   return words;
-		 }
-		   
-
-	  
-	
-				
-	
+		 }	
 }
 	
 

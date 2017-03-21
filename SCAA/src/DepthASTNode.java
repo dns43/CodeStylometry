@@ -121,7 +121,8 @@ public class DepthASTNode {
 			}		
 		}
 	        List maxDepthall = Arrays.asList(ArrayUtils.toObject(maxDepth));
-	        return Collections.max(maxDepthall);
+                //dns43: casted 'comparable' output of .max() to Integer
+	        return (int) Collections.max(maxDepthall);
 	   
 	}
  
@@ -131,18 +132,27 @@ public class DepthASTNode {
 		HashSet<String> functionIDs = new HashSet<String>();
 		HashSet<String> functionIDs2 = new HashSet<String>();
 
-        //take the function id in the beginning of the line.    
+        //take the function id in the beginning of the line.
 		String[] lines = featureText.split("\n");
-		for(int i=0; i< lines.length; i++)
+                
+                for(int i=0; i< lines.length; i++)
 		{
-	        String firstWord = lines[i].substring(0, featureText.indexOf('\t'));
-	        if(!functionIDs.contains(firstWord))
+                //dns43: sourrounded with if statement so non-occurence does not throw error 
+                 String firstWord = "";
+                 if(featureText.indexOf('\t') > -1){
+                	firstWord = lines[i].substring(0, featureText.indexOf('\t'));
+                }
+                if(!functionIDs.contains(firstWord))
 	        functionIDs.add(firstWord);
 		}
 		int [] ASTDepLines=new int[functionIDs.size()];
 		for(int i=0; i< lines.length; i++)
 		{
-	        String firstWord = lines[i].substring(0, featureText.indexOf('\t'));
+                //dns43: sourrounded with if statement so non-occurence does not throw error 
+                String firstWord = "";
+                 if(featureText.indexOf('\t') > -1){
+                	firstWord = lines[i].substring(0, featureText.indexOf('\t'));
+                }
 	        if(i==0)
 	        {
 		    functionIDs2.add(firstWord);

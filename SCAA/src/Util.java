@@ -349,6 +349,7 @@ public class Util {
         filterWildcards.add("*.cpp");
         filterWildcards.add("*.c++");
         filterWildcards.add("*.cc");
+        filterWildcards.add("*.js");
 
 
         FileFilter typeFilter = new WildcardFileFilter(filterWildcards);
@@ -491,21 +492,24 @@ public class Util {
 
         List<String> filterWildcards = new ArrayList<>();
         filterWildcards.add("*.dep");
+        filterWildcards.add("*.ast");
 
         FileFilter typeFilter = new WildcardFileFilter(filterWildcards);
 
         while (directories.isEmpty() == false)
         {
-            List<File> subDirectories = new ArrayList<File>();
+            //dns43: first iteration puts all ast/dep files into textFiles and all subdirectories into subdirectories
+            //dns43: causes error and dont need it List<File> subDirectories = new ArrayList<File>();
 
             for(File f : directories)
             {
-                subDirectories.addAll(Arrays.asList(f.listFiles((FileFilter)DirectoryFileFilter.INSTANCE)));
+                //dns43: LIST<File>.addAll( convertArrayToList (
+                //dns43: causes error and dont need it subDirectories.addAll(Arrays.asList(f.listFiles((FileFilter)DirectoryFileFilter.INSTANCE)));
                 textFiles.addAll(Arrays.asList(f.listFiles(typeFilter)));
             }
 
             directories.clear();
-            directories.addAll(subDirectories);
+            //dns43: causes error and dont need it directories.addAll(subDirectories);
 
 
         }

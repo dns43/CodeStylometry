@@ -1179,32 +1179,42 @@ public static int functionIDCount (String featureText)
 		 Runtime joernTime = Runtime.getRuntime();
 		 Runtime scriptTime = Runtime.getRuntime();
 	
+              //dns43: stops neo4j process (database in ast format) for reset
 	      Process stopDB = dbTime.exec(new String[]{"/bin/sh", "-c",
 	    		   "/Users/Aylin/Desktop/Princeton/Drexel/2014/ARLInternship/joern_related/neo4j-community-1.9.7/bin/neo4j stop"        		   
 	       });
 	       stopDB.waitFor();
+               //dns43: forward neo4j output to java console
 	       BufferedReader br = new BufferedReader(new InputStreamReader(stopDB.getInputStream()));
 	       while(br.ready())
 	           System.out.println(br.readLine());
 	       
+               //dns43: deletes joern-index-folder for reset
 	       Process deleteIndex = dbTime.exec(new String[]{"/bin/sh", "-c","rm -r /Users/Aylin/git/joern/.joernIndex"});
 	       deleteIndex.waitFor();
 	
+               //dns43: run joern on filepath (selected code files)
 	       Process joernRun = joernTime.exec(new String[]{"/bin/sh", "-c", 
 	    		   "cd /Users/Aylin/git/joern"+"\n"+ "java -jar /Users/Aylin/git/joern/bin/joern.jar " + filePath });
 	       joernRun.waitFor();
+               //dns43: forward joern output to java console
 	       BufferedReader br1 = new BufferedReader(new InputStreamReader(joernRun.getInputStream()));
 	       while(br1.ready())
 	           System.out.println(br1.readLine());
-	
+               
+               //dns43_ run neo4j database instance
 	       Process startDB = dbTime.exec(new String[]{"/bin/sh","-c",  
 	    		   "/Users/Aylin/Desktop/Princeton/Drexel/2014/ARLInternship/joern_related/neo4j-community-1.9.7/bin/neo4j start"        		   
 	       });
 	       startDB.waitFor();
+               
+               //dns43: forward neo4j output to java console
 	       BufferedReader br2 = new BufferedReader(new InputStreamReader(startDB.getInputStream()));
 	       while(br2.ready())
 	           System.out.println(br2.readLine());
 	
+               //dns43: create a console command that runs lookup, getAST, astLabel and ast2Features iteratively
+               //dns43: to write a .dep file into the original .c files folder
 	       String output_filename = filePath.substring(0, filePath.length()-3).concat("dep");
 	       String cmd1 = "echo \'queryNodeIndex(\"type:Function\").id\' | "
 	       		+ "python /Users/Aylin/git/joern-tools/lookup.py -g |  "
@@ -1213,19 +1223,23 @@ public static int functionIDCount (String featureText)
 	       		+ "python /Users/Aylin/git/joern-tools/ast2Features.py >" 
 	       		+ output_filename;
 	       
+               //dns43: run command that generates Feature file out of AST?!
 	       Process joernscripts = dbTime.exec((new String[]{"/bin/sh","-c", cmd1}));
 	
 	       joernscripts.waitFor();
+               //dns43: forward python output to java console
 	          BufferedReader br5 = new BufferedReader(new InputStreamReader(joernscripts.getInputStream()));
 	          while(br5.ready())
 	              System.out.println(br5.readLine());
 	         
+               //dns43: forward python ERRORs to java console
 	          BufferedReader br6 = new BufferedReader(new InputStreamReader(joernscripts.getErrorStream()));
 	          while(br6.ready())
 	              System.out.println(br6.readLine());
 	    
 	    	    
-	          
+	         //dns43: write a .ast file into the original .c files folder
+                 //dns43: has the same content as the .dep file, doesn't it?
 		       String output_filename1 = filePath.substring(0, filePath.length()-3).concat("ast");
 		       String cmd2 = "echo \'queryNodeIndex(\"type:Function\").id\' | "
 		       		+ "python /Users/Aylin/git/joern-tools/lookup.py -g |  "
@@ -1270,7 +1284,9 @@ public static int functionIDCount (String featureText)
 	    BufferedReader br4 = new BufferedReader(new InputStreamReader(stopDB.getInputStream()));
 	    while(br4.ready())
 	        System.out.println(br4.readLine());
-	
+            
+            //dns43: this creates dep files (with labels/author names), ast files, and txt files (with actual code)
+            //dns43: therefore uses joern, neo4j and a bunch of python scripts included in the program
 		
 	}
 	
@@ -1279,6 +1295,7 @@ public static int functionIDCount (String featureText)
 		//just needs the name of the directory with the authors and their source files as an input
 		//and outputs .ast files in source file's corresponding directory - has AST information 
 	
+                //dns43: does exactly the same as preprocessDataToTXTdepAST() ...?!
 		 Runtime dbTime = Runtime.getRuntime();
 		 Runtime joernTime = Runtime.getRuntime();
 		 Runtime scriptTime = Runtime.getRuntime();

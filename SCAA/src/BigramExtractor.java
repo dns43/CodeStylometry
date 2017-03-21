@@ -133,12 +133,15 @@ public class BigramExtractor {
 	//	System.out.println(filePath);
 
    String inputText =Util.readFile(filePath);
+    //    System.out.println(inputText);
 	int [] lines = DepthASTNode.getASTDepLines(inputText);
 	String textAST=null;
+     //   System.out.println(lines[0]);
 	for (int j=0; j<lines.length; j++)
 	{
 		//System.out.println(lines[j]);
 
+                System.out.println(DepthASTNode.readLineNumber(inputText, lines[j]));
 		textAST = DepthASTNode.readLineNumber(inputText, lines[j]);
 		String inputTextParanthesisRemoved = textAST.replaceAll("[()]"," ");
 		 inputTextParanthesisRemoved = inputTextParanthesisRemoved.replaceAll("\\d+\\t"," ");
