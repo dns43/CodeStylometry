@@ -492,13 +492,13 @@ public class Util {
 
         List<String> filterWildcards = new ArrayList<>();
         filterWildcards.add("*.dep");
-        filterWildcards.add("*.ast");
+        //dns43: filterWildcards.add("*.ast");
 
         FileFilter typeFilter = new WildcardFileFilter(filterWildcards);
 
         while (directories.isEmpty() == false)
         {
-            //dns43: first iteration puts all ast/dep files into textFiles and all subdirectories into subdirectories
+            //dns43: first iteration puts all dep files into textFiles and all subdirectories into subdirectories
             //dns43: causes error and dont need it List<File> subDirectories = new ArrayList<File>();
 
             for(File f : directories)

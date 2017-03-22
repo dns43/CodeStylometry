@@ -81,6 +81,8 @@ public class FeatureExtractor {
        //dns43: matches .cpp files for everything that appears only once (whitespace as seperator)
        String[] wordUnigramsCPP =FeatureCalculators.wordUnigramsCPP(test_dir);
       //dns43: auskommentiert weil scheiße	
+      //dns43: String Array filled with those Nodes that appear twice in the AST
+      //dns43: e.g. the code has 2 if statements, so IF is a bigram
        String[] ASTNodeBigrams = BigramExtractor.getASTNodeBigrams(test_dir);
     	
 
@@ -129,7 +131,7 @@ public class FeatureExtractor {
     File authorFileName = null;
 	//Writing the classes (authorname)
 	Util.writeFile("@attribute 'authorName' {",output_filename, true);
-        System.out.println(test_file_paths.size());
+        System.out.println("#testfiles:"+test_file_paths.size());
 	for(int i=0; i < test_file_paths.size(); i++){
 		int testIDlength = test_file_paths.get(i).toString().length();   
 		authorFileName= new File(test_file_paths.get(i).toString());
@@ -146,7 +148,7 @@ public class FeatureExtractor {
 		   int authorCount = words.length;
                    if (i+1==test_file_paths.size()){
 		   for (int j=0; j< authorCount; j++){
-			   {System.out.println(words[j]);
+                       {System.out.println("word "+j+": "+words[j]);
 				if(j+1 == authorCount)
 				{
 			   Util.writeFile(words[j]+"}"+"\n\n",output_filename, true);
@@ -175,8 +177,8 @@ public class FeatureExtractor {
 		authorFileName= new File(test_file_paths.get(i).toString());
 		String authorName= authorFileName.getParentFile().getName();
 
-		System.out.println(test_file_paths.get(i));
-		System.out.println(authorName);
+		System.out.println("i-th file: "+test_file_paths.get(i));
+		System.out.println("authorname:"+authorName);
 		File fileCPPID = new File(test_cpp_paths.get(i).toString());
 		String fileNameID = fileCPPID.getName();
 		Util.writeFile(fileNameID+",", output_filename, true);
@@ -222,8 +224,8 @@ public class FeatureExtractor {
             //dns43: auskommentiert weil scheiße
 //		float[] bigramCount = BigramExtractor.getASTNodeBigramsTF(DepASTText, ASTNodeBigrams );
 //		for (int j=0; j<ASTNodeBigrams.length; j++)
-//		{Util.writeFile(bigramCount[j] +",", output_filename, true);}	    
-		System.out.println("j"); 
+//		{Util.writeFile(bigramCount[j] +",", output_filename, true);}
+
 	    //get count of each wordUnigram in CPP source file	 
 	    float[] wordUniCount = FeatureCalculators.WordUnigramTF(sourceCode, wordUnigramsCPP);
 	    for (int j=0; j<wordUniCount.length; j++)

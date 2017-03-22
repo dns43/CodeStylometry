@@ -120,9 +120,9 @@ public class DepthASTNode {
 			  		maxDepth[j]=0;		  	 
 			}		
 		}
-	        List maxDepthall = Arrays.asList(ArrayUtils.toObject(maxDepth));
+	        List<Integer> maxDepthall = Arrays.asList(ArrayUtils.toObject(maxDepth));
                 //dns43: casted 'comparable' output of .max() to Integer
-	        return (int) Collections.max(maxDepthall);
+	        return Collections.max(maxDepthall);
 	   
 	}
  
@@ -133,19 +133,25 @@ public class DepthASTNode {
 		HashSet<String> functionIDs2 = new HashSet<String>();
 
         //take the function id in the beginning of the line.
+        
+        //dns43: split .dep file into lines store line content into array
 		String[] lines = featureText.split("\n");
-                
+        //dns43: iterate lines        
                 for(int i=0; i< lines.length; i++)
-		{
+		{    
                 //dns43: sourrounded with if statement so non-occurence does not throw error 
                  String firstWord = "";
                  if(featureText.indexOf('\t') > -1){
-                	firstWord = lines[i].substring(0, featureText.indexOf('\t'));
+                        //dns43: store line content till first \t to "firstWord"
+                        firstWord = lines[i].substring(0, featureText.indexOf('\t'));
                 }
+                //dns43: if firstWord unknown, add to functionIDs 
                 if(!functionIDs.contains(firstWord))
 	        functionIDs.add(firstWord);
 		}
+                //new Integer Array of same size as functionIDs
 		int [] ASTDepLines=new int[functionIDs.size()];
+                
 		for(int i=0; i< lines.length; i++)
 		{
                 //dns43: sourrounded with if statement so non-occurence does not throw error 
@@ -159,11 +165,21 @@ public class DepthASTNode {
 	        }
 	        else
 	        {
+                    //dns43: if firstWord unknown ...
 	        	if(!functionIDs2.contains(firstWord))
 	        	{
+                            //dns43: ... ASTDepLines[0] = 0
+                            //dns43: ... ASTDepLines[1] = 1
+                            //dns43: ... ASTDepLines[2] = 2
+                            //... lets say word 3 is already in the list
+                            //... so in the end functionIDs2 grows
+                            //... but ASTDepLines[3] stays empty!?
+                            //...then...
+                            //dns43: ... ASTDepLines[4] = 4
 	        		int lineNumber = i-1;
 	        		ASTDepLines[functionIDs2.size()-1] = lineNumber;
 	        	}
+                        //dns43: if last line 
 	        	if(i==lines.length-1)
 	        	{
 	        		int lineNumber = i;
@@ -179,6 +195,7 @@ public class DepthASTNode {
 	//starts from 0
     public static String readLineNumber (String featureText, int lineNumber) throws IOException
     {
+        //dns43: reads featureText into a List of lines, returns the chosen line "lineNumber" which contains the CODE of that line
     	List<String> lines = IOUtils.readLines(new StringReader(featureText));  	
     	return lines.get(lineNumber);
     }

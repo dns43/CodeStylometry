@@ -118,31 +118,33 @@ public class BigramExtractor {
     	
 }
     
-    
+    //dns43: expected to give back a String Array consisting of all Nodes that appear twice
+    //dns43: parameter is the path "../astfiles/" where .dep, .ast, .js, .txt are stored
     public static String [] getASTNodeBigrams(String dirPath) throws IOException{
-
-
-    List test_file_paths = Util.listDepFiles(dirPath);
+     
+        //dns43: test_file_paths holds paths to all .dep files in that specific folder (LIST in case author has multiple programs)
+        List test_file_paths = Util.listDepFiles(dirPath);
 	Set<String> uniqueWords = new LinkedHashSet<String>();
 	List<String> unigrams = new ArrayList<String>();
 	Set<String> bigrams = new LinkedHashSet<String>();
 	String[] uniquebigrams = null;
 	
     for(int i=0; i< test_file_paths.size(); i++){
-		String filePath = test_file_paths.get(i).toString();  
-	//	System.out.println(filePath);
+		String filePath = test_file_paths.get(i).toString();
 
    String inputText =Util.readFile(filePath);
-    //    System.out.println(inputText);
+    
+        //dns43: strange part, had to be fixed
+        //dns43: returns the total number of lines of the dep file
+        //dns43: just one value, why stored into an array?
 	int [] lines = DepthASTNode.getASTDepLines(inputText);
+        System.out.println("line 1: "+lines[0]);
 	String textAST=null;
-     //   System.out.println(lines[0]);
-	for (int j=0; j<lines.length; j++)
+        System.out.println("#lines: "+lines.length);
+	for (int j=0; j<lines[0]; j++)
 	{
-		//System.out.println(lines[j]);
-
-                System.out.println(DepthASTNode.readLineNumber(inputText, lines[j]));
-		textAST = DepthASTNode.readLineNumber(inputText, lines[j]);
+                System.out.println("asd "+DepthASTNode.readLineNumber(inputText, j));
+		textAST = DepthASTNode.readLineNumber(inputText, j);
 		String inputTextParanthesisRemoved = textAST.replaceAll("[()]"," ");
 		 inputTextParanthesisRemoved = inputTextParanthesisRemoved.replaceAll("\\d+\\t"," ");
 		 inputTextParanthesisRemoved = inputTextParanthesisRemoved.replaceAll("( )+"," ");
