@@ -7,9 +7,12 @@ package src;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -125,5 +128,56 @@ public class EsprimaWrapper {
             e.printStackTrace(System.err);
         }
     }
+        
+        public String[] parseDepFile2(File depfile){
+        
+        String source = "";
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader(depfile));
+                while(reader.ready()){
+                    source = ""+reader.read();
+                }        
+            
+        String tokenpart = source.substring(source.indexOf("\"tokens\": ["), source.length()-3);
+        System.out.println("#tokens: "+tokenpart.length()/4);
+        String[] tokens = tokenpart.split("},");
+        
+        
+        String[] functionIDs = tokenpart.split("\"value\": \"function\"");
+        for(int i = 0; i<functionIDs.length; i++){
+            functionIDs[i].replace("\n", "\n\t"+i);
+        }
+        
+        /*
+        String functionIDs;
+        List<Integer> funcs = new ArrayList<Integer>();
+        while(tokenpart.indexOf("\"value\": \"function\"") != tokenpart.lastIndexOf("\"value\": \"function\"")){
+            funcs.add(tokenpart.indexOf("\"value\": \"function\"", funcs.get(funcs.size()-1)));
+        }
+        for(int i = funcs.get(j)-2; i<funcs.get(j+1); i++){
+        }
+        */
+        PrintWriter out = new PrintWriter(" C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\testJS\\fileIDs.txt");
+        for(int i = 0; i<functionIDs.length;i++){
+        out.print(functionIDs[i]);
+        }
+        
+        return tokens;
+        }
+              catch (FileNotFoundException ex) {
+                Logger.getLogger(EsprimaWrapper.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(EsprimaWrapper.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        return null;
+        }
+        
+        public void writeFunctionIDs(){
+            
 
+            //parse for         {            "type": "Keyword",            "value": "function"        },
+            //give numbers starting a counter from 1
+            //write "counter\t" to the beginning of each line
+            
+        }
 }

@@ -133,18 +133,18 @@ public class BigramExtractor {
 		String filePath = test_file_paths.get(i).toString();
 
    String inputText =Util.readFile(filePath);
-    
-        //dns43: strange part, had to be fixed
-        //dns43: returns the total number of lines of the dep file
-        //dns43: just one value, why stored into an array?
+       //dns43: expected as: lines = {line1, line2, line i,line n}
 	int [] lines = DepthASTNode.getASTDepLines(inputText);
-        System.out.println("line 1: "+lines[0]);
 	String textAST=null;
-        System.out.println("#lines: "+lines.length);
-	for (int j=0; j<lines[0]; j++)
+
+        //dns43: changed from j<lines.length, which was 1, but storing number of lines of codes
+	for (int j=0; j<lines.length; j++)
 	{
                 System.out.println("asd "+DepthASTNode.readLineNumber(inputText, j));
-		textAST = DepthASTNode.readLineNumber(inputText, j);
+		//dns43: reads input into a list, returns content of line j
+                //dns43: but which confusingly is line 1 not line 1069
+                textAST = DepthASTNode.readLineNumber(inputText, j);
+                //dns43: replaces [()] \d \t ( )+ but why?
 		String inputTextParanthesisRemoved = textAST.replaceAll("[()]"," ");
 		 inputTextParanthesisRemoved = inputTextParanthesisRemoved.replaceAll("\\d+\\t"," ");
 		 inputTextParanthesisRemoved = inputTextParanthesisRemoved.replaceAll("( )+"," ");
@@ -152,16 +152,20 @@ public class BigramExtractor {
 	//	System.out.println(inputTextParanthesisRemoved);
 
 //   Pattern pattern = Pattern.compile("([\\w']+)");
+                    //dns43:  finds words?!
 		   Pattern pattern = Pattern.compile("(\\w+)\\s+");
 		   Matcher matcher = pattern.matcher(inputTextParanthesisRemoved);
 		   
-		   
+		   //dns43: go through matcher and store "matcher.groups"
 			while (matcher.find()) {
-//				System.out.println("Found a " + matcher.group() + ".");
+				System.out.println("DNS43: Found a " + matcher.group() + ".");
+                                //dns43: stores findings to list
 				unigrams.add(matcher.group());
 			}
 			
 		   while (matcher.find()) {
+                       //dns43: store group 1 to LinkedHashSet
+                       //dns43: this is never used
 		       uniqueWords.add(matcher.group(1));}
 		   
 		   }
@@ -171,9 +175,13 @@ public class BigramExtractor {
 	
 
  //   String[] words = uniqueWords.toArray(new String[0]);
+        //dns43: iterate over unigrams
 	for(int i=1; i<unigrams.size(); i++){
 	   //   System.out.println( unigrams.get(i-1));
+                   //dns43: get two subsequent unigrams and write them to a LinkedHashset
+                   //dnsr43: writing them to a hashset assures they are uniqu
 		   bigrams.add(unigrams.get(i-1).trim() + " "+unigrams.get(i).trim());
+                   //dns43: convert to a String
 		       uniquebigrams = bigrams.toArray(new String[bigrams.size()]);
 	}	
 /*	for(int i=1; i<uniquebigrams.length; i++){

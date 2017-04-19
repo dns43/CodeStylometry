@@ -79,7 +79,9 @@ public class DepthASTNode {
 
    
 	
-	
+	//Caller is FeatureExtractor
+        //arg1 = content of dep file
+        //arg2 = String of unique words in dep file
 	public static int getMaxDepthASTLeaf(String featureText, String[] ASTTypes) throws IOException
 	{
 		int [] lines = getASTDepLines(featureText);
@@ -129,53 +131,50 @@ public class DepthASTNode {
     //line number starts from 0
 	public static int[] getASTDepLines(String featureText)
 	{		
+            
+                //dns43: functionIDs is used to count how many IDs there are and scale array ASTDepLines[]
 		HashSet<String> functionIDs = new HashSet<String>();
+                //dns43: helps to write functionIDs in ASTDepLines[] to the index of their first occurence
 		HashSet<String> functionIDs2 = new HashSet<String>();
 
-        //take the function id in the beginning of the line.
+                //take the function id in the beginning of the line.
         
-        //dns43: split .dep file into lines store line content into array
+                //dns43: split .dep file into lines store line content into array
 		String[] lines = featureText.split("\n");
-        //dns43: iterate lines        
+                //dns43: stores first functionID occurence to functionIDs
                 for(int i=0; i< lines.length; i++)
 		{    
-                //dns43: sourrounded with if statement so non-occurence does not throw error 
-                 String firstWord = "";
-                 if(featureText.indexOf('\t') > -1){
-                        //dns43: store line content till first \t to "firstWord"
-                        firstWord = lines[i].substring(0, featureText.indexOf('\t'));
-                }
-                //dns43: if firstWord unknown, add to functionIDs 
-                if(!functionIDs.contains(firstWord))
-	        functionIDs.add(firstWord);
+                    String firstWord = "";
+                    //dns43: sourrounded with if statement so non-occurence does not throw error 
+                    if(featureText.indexOf('\t') > -1){
+                        if(!lines[i].isEmpty()){
+                            firstWord = lines[i].substring(0, featureText.indexOf('\t'));
+                        }
+                    }
+                    if(!functionIDs.contains(firstWord))
+                        functionIDs.add(firstWord);
 		}
-                //new Integer Array of same size as functionIDs
+                //dns43: new Integer Array of same size as HashSet functionIDs
 		int [] ASTDepLines=new int[functionIDs.size()];
                 
+                //dns43: stores linenumber of first occurence of each functionID to ASTDepLines[]
 		for(int i=0; i< lines.length; i++)
 		{
-                //dns43: sourrounded with if statement so non-occurence does not throw error 
-                String firstWord = "";
-                 if(featureText.indexOf('\t') > -1){
-                	firstWord = lines[i].substring(0, featureText.indexOf('\t'));
-                }
-	        if(i==0)
-	        {
-		    functionIDs2.add(firstWord);
-	        }
-	        else
-	        {
-                    //dns43: if firstWord unknown ...
+                    //dns43: sourrounded with if statement so non-occurence does not throw error 
+                    String firstWord = "";
+                    if(featureText.indexOf('\t') > -1){
+                        if(!lines[i].isEmpty()){
+                            firstWord = lines[i].substring(0, featureText.indexOf('\t'));
+                        }
+                    }
+                    if(i==0)
+                    {
+                        functionIDs2.add(firstWord);
+                    }
+                    else
+                    {
 	        	if(!functionIDs2.contains(firstWord))
 	        	{
-                            //dns43: ... ASTDepLines[0] = 0
-                            //dns43: ... ASTDepLines[1] = 1
-                            //dns43: ... ASTDepLines[2] = 2
-                            //... lets say word 3 is already in the list
-                            //... so in the end functionIDs2 grows
-                            //... but ASTDepLines[3] stays empty!?
-                            //...then...
-                            //dns43: ... ASTDepLines[4] = 4
 	        		int lineNumber = i-1;
 	        		ASTDepLines[functionIDs2.size()-1] = lineNumber;
 	        	}
@@ -185,10 +184,13 @@ public class DepthASTNode {
 	        		int lineNumber = i;
 	        		ASTDepLines[functionIDs2.size()-1] = lineNumber;
 	        	}
+                        //dns43: first wird is only add if NEW
+                        //dns43: remember: funcutionIDs2 is a HashSet!!!
 		    functionIDs2.add(firstWord);
-	        }
+                    }
 		}       	
-	       return ASTDepLines;        
+                //dns43: looks somehow like: {line0,line1,line i,,line n}
+                return ASTDepLines;        
 	}
     
 	
