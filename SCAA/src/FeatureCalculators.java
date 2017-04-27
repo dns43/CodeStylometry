@@ -323,13 +323,13 @@ public class FeatureCalculators {
      
           public static String[] uniqueJSDepASTTypes(String dirPath) throws IOException, InterruptedException{
               //dns43: should be listASTFiles here
-	    List test_file_paths = Util.listDepFiles(dirPath);
+	    List test_file_paths = Util.listASTFiles(dirPath);
             HashSet<String> uniqueWords = new HashSet<String>();
 
 	    for(int i=0; i< test_file_paths.size(); i++){
                     String filePath = test_file_paths.get(i).toString();  
                     //dns43: testing purpose; we shoud discuss if we use file types .ast/.dep or .txt
-                    filePath = "C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\testJS\\js_ast.txt";
+                    //filePath = "C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\testJS\\js_ast.txt";
                     String inputText =Util.readFile(filePath);
                     String[] lines = inputText.split("\n");
                     

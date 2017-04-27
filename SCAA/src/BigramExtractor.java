@@ -254,7 +254,6 @@ public class BigramExtractor {
                     String unigramsS = null;
                     float [] counter = new float[ASTNodeBigrams.length];
                     
-	System.out.println("AAAAH");
                     for(int l = 0; l<lines.length; l++){
                         if(lines[l].contains("type")){
                               lines[l] = lines[l].replaceAll( " ","");
@@ -272,12 +271,9 @@ public class BigramExtractor {
                     for(int i = 0; i< unigrams.size(); i++){
                         u = u.concat(" "+unigrams.get(i));
                     }
-                    System.out.println(u);
                     //for(int j = 1; j<unigrams.size(); j++){
                         for(int i = 0; i<ASTNodeBigrams.length;i++){
-                        System.out.println("unigram: "+ASTNodeBigrams[i]);
-                        counter[i] = StringUtils.countMatches(u, ASTNodeBigrams[i]); 
-                        System.out.println("#: "+counter[i]);
+                        counter[i] = StringUtils.countMatches(u, ASTNodeBigrams[i]);
                       //  }
                         //System.out.println(ASTNodeBigrams[j] + " appearance: "+counter[j]); 
                     }

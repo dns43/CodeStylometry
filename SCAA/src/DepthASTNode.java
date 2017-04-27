@@ -61,7 +61,7 @@ public class DepthASTNode {
                     avgDepth[j]= totalDepth[j]/occurrences[j];
                     
                     }//dns43: debug output
-                    System.out.println(ASTTypes[j]+" avgDepth: "+avgDepth[j] + " of  "+occurrences[j]+" in total");
+                    //System.out.println(ASTTypes[j]+" avgDepth: "+avgDepth[j] + " of  "+occurrences[j]+" in total");
                 }
 		return avgDepth;
 	}

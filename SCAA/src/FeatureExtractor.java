@@ -29,6 +29,17 @@ public class FeatureExtractor {
 				  "typename",	"union",	"unsigned",	"using",	"virtual",	"void",	"volatile",	"wchar_t",	"while",
 				  "xor",	"xor_eq", "override", "final"};
 		  
+                   String [] JSKeywords = {"do", "if", "in", "for", "let", 
+        "new", "try", "var", "case", "else", "enum", "eval", "this", "true", "void",
+        "with", "await", "break", "catch", "class", "const", "false", "super", "throw",
+        "while", "yield", "delete", "export", "import", "public", "return", 
+        "static", "switch", "typeof", "default", "extends", "finally",
+        "package", "private", "continue", "debugger", "function", "arguments",
+        "interface", "protected", "implements", "instanceof", "await"};
+        //dns43: delete comment to add older version's keywords
+        //,"int", "byte", "goto", "long", "final", "float", "short", " double"
+        //, " native", " throws", " boolean", " abstract", " volatile", " transient", "synchronized"
+        //, " NaN", " Infinity", " undefined};
 		  
 		//Specifying the test arff filename
 		Calendar cal = Calendar.getInstance();
@@ -40,18 +51,20 @@ public class FeatureExtractor {
     	//TODO when time changes, output_filename changes every time which needs to be corrected
 //       	String output_filename = "/Users/Aylin/Desktop/Drexel/2014/ARLInternship/SCAAarffs/incremental/" +"CodeJam_14FilesPerAuthor_2014_"+ (month+1) + "." + 
 //    	dayOfMonth + "_"+ time +".arff" ;
-       	for(int numberFiles=2; numberFiles<4; numberFiles++){
+       	//for(int numberFiles=2; numberFiles<4; numberFiles++){
     	//dns43: replace those paths by my own ones
         //String output_filename = "/Users/Aylin/Desktop/Drexel/2014/ARLInternship/SCAAarffs/"
     	//		+ "mallory_150/SFS/" +"mallory_SFS_"+numberFiles+".arff" ;
-              String output_filename = "C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\astfiles\\protobuf.arff";
-	      String test_dir ="C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\astfiles\\";
+        String output_filename = "C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\7authors4file\\CodeJam_4FilesPerAuthor.arff" ;
+        
+	      String test_dir ="C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\7authors4file\\";
        	List test_file_paths = Util.listTextFiles(test_dir);
 
 	String text = "";
   	//Writing the test arff
   	//first specify relation
-	Util.writeFile("@relation "+numberFiles+"mallory_dataset_SFS_"+numberFiles+"\n"+"\n", output_filename, true);
+	//Util.writeFile("@relation "+numberFiles+"mallory_dataset_SFS_"+numberFiles+"\n"+"\n", output_filename, true);
+	Util.writeFile("@relation CodeJam_4FilesPerAuthor\n"+"\n", output_filename, true);
 	Util.writeFile("@attribute instanceID {", output_filename, true);
    	List test_cpp_paths = Util.listCPPFiles(test_dir);
    	for(int j=0; j < test_cpp_paths.size();j++ )
@@ -78,19 +91,13 @@ public class FeatureExtractor {
 //Use the following for syntactic inner nodes and code leaves (remember to change astlabel.py accordingly!
        //dns43: matches .dep files in test_dir for unique patterns matching regex "([\\w']+)"
        String[] ASTtypes = FeatureCalculators.uniqueJSDepASTTypes(test_dir);
-       for(int i = 0; i<ASTtypes.length; i++){
-           System.out.println(i+": \n");
-           System.out.println(ASTtypes[i]);
-       }
+
        //dns43: matches .cpp files for everything that appears only once (whitespace as seperator)
        String[] wordUnigramsCPP =FeatureCalculators.wordUnigramsCPP(test_dir);
       //dns43: auskommentiert weil scheiße	
       //dns43: String Array filled with those Nodes that appear twice in the AST
       //dns43: e.g. the code has 2 if statements, so IF is a bigram
        String[] ASTNodeBigrams = BigramExtractor.getJSASTNodeBigrams(test_dir);
-    	for(int i = 0; i<ASTNodeBigrams.length; i++){
-            System.out.println("Bigram "+i+": "+ASTNodeBigrams[i]);
-        }
 
     //if only interested in syntactic features use this if the dep file contains user input    
  //   String[] ASTtypes =FeatureCalculators.uniqueASTTypes(test_dir);
@@ -106,11 +113,10 @@ public class FeatureExtractor {
 /*    for (int i=0; i<ASTtypes.length; i++)	
     {	Util.writeFile("@attribute 'ASTtypesTFIDF["+i+"]' numeric"+"\n", output_filename, true);}
 */
-//dns43: auskommentiert weil scheiße
-//        System.out.print(ASTNodeBigrams.length);
-//    	for (int i=0; i<ASTNodeBigrams.length; i++)		
-//  	  {  	ASTNodeBigrams[i] = ASTNodeBigrams[i].replace("'", "apostrophesymbol");
-//  	    	Util.writeFile("@attribute 'ASTNodeBigramsTF "+i+"=["+ASTNodeBigrams[i]+"]' numeric"+"\n", output_filename, true);}
+        System.out.print(ASTNodeBigrams.length);
+    	for (int i=0; i<ASTNodeBigrams.length; i++)		
+ 	  {  	ASTNodeBigrams[i] = ASTNodeBigrams[i].replace("'", "apostrophesymbol");
+  	    	Util.writeFile("@attribute 'ASTNodeBigramsTF "+i+"=["+ASTNodeBigrams[i]+"]' numeric"+"\n", output_filename, true);}
       
     	for (int i=0; i<wordUnigramsCPP.length; i++)	   	
        {  	wordUnigramsCPP[i] = wordUnigramsCPP[i].replace("'", "apostrophesymbol");
@@ -127,11 +133,14 @@ public class FeatureExtractor {
     for (int i=0; i<ASTtypes.length; i++)	
   {	    ASTtypes[i] = ASTtypes[i].replace("'", "apostrophesymbol");
     	Util.writeFile("@attribute 'ASTNodeTypeAvgDep "+i+"=["+ASTtypes[i]+"]' numeric"+"\n", output_filename, true);}
+    /* //dns43: use JSKeywords instead
     for (int i=0; i<cppKeywords.length; i++)	
   {	Util.writeFile("@attribute 'cppKeyword "+i+"=["+cppKeywords[i]+"]' numeric"+"\n", output_filename, true);}
-
+*/
+    for (int i=0; i<JSKeywords.length; i++)	
+  {	Util.writeFile("@attribute 'cppKeyword "+i+"=["+JSKeywords[i]+"]' numeric"+"\n", output_filename, true);}
     
-    //dns43: right now the header is written,
+    //dns43: till here the header wass written,
     //dns43: now the label:
     //dns43: here the authors for all of the files are written as once, as all paths are written in @InstanceID
     File authorFileName = null;
@@ -191,18 +200,20 @@ public class FeatureExtractor {
 		Util.writeFile(FeatureCalculators.functionIDJSCount(featureText)+",", output_filename, true);
 		//dns43:C/C++ ast path replaced by JS ast path
                 //String ASTText = Util.readFile(test_file_paths.get(i).toString().substring(0,testIDlength-3)+"ast");
-                String ASTText = Util.readFile("C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\testJS\\js_ast.txt");
+                //String ASTText = Util.readFile("C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\testJS\\js_ast.txt");
+                String ASTText = Util.readFile(test_file_paths.get(i).toString().substring(0,testIDlength-3)+"ast");
                 //dns43: C/C++ dep path replaced by JS dep path
 		//String DepASTText = Util.readFile(test_file_paths.get(i).toString().substring(0,testIDlength-3)+"dep");
-                //String DepASTText = Util.readFile(test_file_paths.get(i).toString().substring(0,testIDlength-3)+"dep");
-                String DepASTText = Util.readFile("C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\testJS\\js_ast.txt");
+                String DepASTText = Util.readFile(test_file_paths.get(i).toString().substring(0,testIDlength-3)+"ast");
+                //String DepASTText = Util.readFile("C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\testJS\\js_ast.txt");
                 //dns43: replace cpp with js
                 //String sourceCode = Util.readFile(test_file_paths.get(i).toString().substring(0,testIDlength-3)+"cpp");
-		String sourceCode = Util.readFile("C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\testJS\\protobuf.js");
+		//String sourceCode = Util.readFile("C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\testJS\\protobuf.js");
+                String sourceCode = Util.readFile(test_file_paths.get(i).toString().substring(0,testIDlength-3)+"js");
 
 		Util.writeFile(FeatureCalculators.CFGNodeCount(ASTText)+",", output_filename, true);
 		Util.writeFile(FeatureCalculators.ASTFunctionIDCount(ASTText)+",", output_filename, true);
-		Util.writeFile(DepthASTNode.getJSMaxDepthASTLeaf(DepASTText, ASTtypes)+",", output_filename, true);
+		Util.writeFile(DepthASTNode.getJSMaxDepthASTLeaf(ASTText, ASTtypes)+",", output_filename, true);
 		
 //		
 		
@@ -265,7 +276,7 @@ public class FeatureExtractor {
 
    	
    			}
-       	}
+       	
    	}
    
 	  
