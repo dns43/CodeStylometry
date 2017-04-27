@@ -4,7 +4,9 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,10 +29,46 @@ public class DepthASTNode {
     		System.out.println(DepASTTypes[i]+","+depFeature[i]);
     	
     }
-	
-    
-	public static float[] getAvgDepthASTNode(String featureText, String[] ASTTypes) throws IOException
+	public static float[] getJSAvgDepthASTNode(String featureText, String[] ASTTypes) throws IOException
 	{
+            //dns43: lines = {line of first function ID, line of second function ID, line of ith functionID,,,}
+		float [] avgDepth=new float[ASTTypes.length];
+                int[] occurrences = new int[ASTTypes.length];
+                
+                 //dns43: lines = {line of first function ID, line of second function ID, line of ith functionID,,,}
+		//int [] lines = getASTDepLines(featureText);
+		int [] totalDepth=new int[ASTTypes.length];
+                List<String> lines = IOUtils.readLines(new StringReader(featureText));
+                //dns43: again... only iteration the first .depfile line of each function
+		for (int i=0; i<lines.size()-1; i++)
+		{
+                    //dns43: debug line     
+                    //System.out.println("line "+i);
+                    //System.out.println(lines.get(i));
+                    for (int j=0; j< ASTTypes.length; j++){                        
+                        if(lines.get(i).contains(ASTTypes[j])){
+                            //dns43: debug line
+                            //System.out.println(i+" FOUND!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                            occurrences[j]++;
+                            totalDepth[j] = totalDepth[j]+lines.get(i).indexOf("t");
+                        }                      
+                    }
+                }
+                for (int j=0; j< ASTTypes.length; j++){
+                    if(occurrences[j] == 0){
+                        avgDepth[j] =0;
+                    }else{
+                    avgDepth[j]= totalDepth[j]/occurrences[j];
+                    
+                    }//dns43: debug output
+                    System.out.println(ASTTypes[j]+" avgDepth: "+avgDepth[j] + " of  "+occurrences[j]+" in total");
+                }
+		return avgDepth;
+	}
+   
+        public static float[] getAvgDepthASTNode(String featureText, String[] ASTTypes) throws IOException
+	{
+            //dns43: lines = {line of first function ID, line of second function ID, line of ith functionID,,,}
 		int [] lines = getASTDepLines(featureText);
 		float [] occurrences=new float[ASTTypes.length];
 		float [] totalDepth=new float[ASTTypes.length];
@@ -77,34 +115,38 @@ public class DepthASTNode {
 		return avgDepth;
 	}
 
-   
 	
 	//Caller is FeatureExtractor
         //arg1 = content of dep file
         //arg2 = String of unique words in dep file
 	public static int getMaxDepthASTLeaf(String featureText, String[] ASTTypes) throws IOException
 	{
+                //dns43: lines = {line of first function ID, line of second function ID, line of ith functionID,,,}
 		int [] lines = getASTDepLines(featureText);
 		int [] occurrences=new int[ASTTypes.length];
 		int [] maxDepth=new int[ASTTypes.length];
 
 		String textAST=null;
+                //dns43: again... only iteration the first .depfile line of each function
 		for (int i=0; i<lines.length; i++)
 		{
+                    
 			textAST = readLineNumber(featureText, lines[i]);
 			for (int j=0; j< ASTTypes.length; j++)
 			{
-			  	 String str = ASTTypes[j].toString();
-		         WholeWordIndexFinder finder = new WholeWordIndexFinder(textAST);
-		         List<IndexWrapper> occurrencesHere = finder.findIndexesForKeyword(str);
-			  	 occurrences[j] = occurrences[j] + occurrencesHere.size();
+			  	String str = ASTTypes[j].toString();
+                                WholeWordIndexFinder finder = new WholeWordIndexFinder(textAST);
+                                List<IndexWrapper> occurrencesHere = finder.findIndexesForKeyword(str);
+			  	occurrences[j] = occurrences[j] + occurrencesHere.size();
 			  	 
 
 			  	 for(int k=0; k<occurrencesHere.size(); k++)
 			  	 {
 			  	   int rightParanthesis =0;//(
 			  	   int leftParanthesis =0;//)
-
+                                   
+                                   //dns43: for a certain word/expression looks how many unclosed paranthesis existe before
+                                   //dns43: thereby gets how deeply nested the word/expression is used
 			  	   for (Character c: textAST.substring(0,occurrencesHere.get(k).getStart()).toCharArray()) {
 			  	       if (c.equals('(')) {
 			  	    	 rightParanthesis++;
@@ -113,7 +155,7 @@ public class DepthASTNode {
 			  	    	 leftParanthesis++;
 			  	       }
 			  	   }
-
+                                //dns43: saves the deepest use
 				if((rightParanthesis-leftParanthesis) > maxDepth[j])
 					maxDepth[j]= rightParanthesis-leftParanthesis;
 				}
@@ -127,7 +169,37 @@ public class DepthASTNode {
 	        return Collections.max(maxDepthall);
 	   
 	}
- 
+        
+        //dns43: needs .ast file as input
+        //dns43: doesnt use ASTTypes[]
+        //dns43: returns array of max depths, but no reference array (no asttypes)
+ 	public static int getJSMaxDepthASTLeaf(String featureText, String[] ASTTypes) throws IOException
+	{
+                //dns43: lines = {line of first function ID, line of second function ID, line of ith functionID,,,}
+		//int [] lines = getASTDepLines(featureText);
+		int [] maxDepth=new int[ASTTypes.length];
+                List<String> lines = IOUtils.readLines(new StringReader(featureText));
+                //dns43: again... only iteration the first .depfile line of each function
+		for (int i=0; i<lines.size()-1; i++)
+		{
+                    for (int j=0; j< ASTTypes.length; j++){
+                        if( lines.get(i).contains(ASTTypes[j])){
+                            if(maxDepth[j] < lines.get(i).indexOf("\"")){
+                                //dns43: debug line
+                                //System.out.println("Max Depth of "+ASTTypes[j]+ ", alt: "+ maxDepth[j] + " neu: "+ lines.get(i).indexOf("\"")+" at line "+i);
+                                maxDepth[j] = lines.get(i).indexOf("\"");
+                                }
+                        }                      
+                    }
+		}
+	        List<Integer> maxDepthall = Arrays.asList(ArrayUtils.toObject(maxDepth));
+                //dns43: casted 'comparable' output of .max() to Integer
+                //dns43: actually this is super stupid, it would be enoough to walk lines and count whitespaces
+	        return Collections.max(maxDepthall);
+	   
+	}
+        
+        
     //line number starts from 0
 	public static int[] getASTDepLines(String featureText)
 	{		

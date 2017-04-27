@@ -118,79 +118,203 @@ public class BigramExtractor {
     	
 }
     
-    //dns43: expected to give back a String Array consisting of all Nodes that appear twice
+    //dns43: returns an array of all unique subsequent unigrams
+    //dns43: found in every very first dep line of a function <- why only that line
     //dns43: parameter is the path "../astfiles/" where .dep, .ast, .js, .txt are stored
     public static String [] getASTNodeBigrams(String dirPath) throws IOException{
      
         //dns43: test_file_paths holds paths to all .dep files in that specific folder (LIST in case author has multiple programs)
         List test_file_paths = Util.listDepFiles(dirPath);
+        //dns43: uniqueWords is never used
 	Set<String> uniqueWords = new LinkedHashSet<String>();
 	List<String> unigrams = new ArrayList<String>();
 	Set<String> bigrams = new LinkedHashSet<String>();
 	String[] uniquebigrams = null;
 	
-    for(int i=0; i< test_file_paths.size(); i++){
-		String filePath = test_file_paths.get(i).toString();
+        for(int i=0; i< test_file_paths.size(); i++){
+            String filePath = test_file_paths.get(i).toString();
 
-   String inputText =Util.readFile(filePath);
-       //dns43: expected as: lines = {line1, line2, line i,line n}
-	int [] lines = DepthASTNode.getASTDepLines(inputText);
-	String textAST=null;
+            String inputText =Util.readFile(filePath);
+            //dns43: lines = {line of first function ID, line of second function ID, line of ith functionID,,,}
+            //dns43: not needed for JS, because whole AST file can be used
+            int [] lines = DepthASTNode.getASTDepLines(inputText);
+            String textAST=null;
 
-        //dns43: changed from j<lines.length, which was 1, but storing number of lines of codes
-	for (int j=0; j<lines.length; j++)
-	{
-                System.out.println("asd "+DepthASTNode.readLineNumber(inputText, j));
-		//dns43: reads input into a list, returns content of line j
-                //dns43: but which confusingly is line 1 not line 1069
-                textAST = DepthASTNode.readLineNumber(inputText, j);
-                //dns43: replaces [()] \d \t ( )+ but why?
-		String inputTextParanthesisRemoved = textAST.replaceAll("[()]"," ");
-		 inputTextParanthesisRemoved = inputTextParanthesisRemoved.replaceAll("\\d+\\t"," ");
-		 inputTextParanthesisRemoved = inputTextParanthesisRemoved.replaceAll("( )+"," ");
 
-	//	System.out.println(inputTextParanthesisRemoved);
+            for (int j=0; j<lines.length; j++)
+            {
+                    textAST = DepthASTNode.readLineNumber(inputText, lines[j]);
+                    //dns43: replace functioniID, Tabulators and Paranthesis in each FIRST function line
+                    String inputTextParanthesisRemoved = textAST.replaceAll("[()]"," ");
+                    inputTextParanthesisRemoved = inputTextParanthesisRemoved.replaceAll("\\d+\\t"," ");
+                    inputTextParanthesisRemoved = inputTextParanthesisRemoved.replaceAll("( )+"," ");
 
-//   Pattern pattern = Pattern.compile("([\\w']+)");
-                    //dns43:  finds words?!
-		   Pattern pattern = Pattern.compile("(\\w+)\\s+");
-		   Matcher matcher = pattern.matcher(inputTextParanthesisRemoved);
-		   
-		   //dns43: go through matcher and store "matcher.groups"
-			while (matcher.find()) {
-				System.out.println("DNS43: Found a " + matcher.group() + ".");
-                                //dns43: stores findings to list
-				unigrams.add(matcher.group());
-			}
-			
-		   while (matcher.find()) {
-                       //dns43: store group 1 to LinkedHashSet
-                       //dns43: this is never used
-		       uniqueWords.add(matcher.group(1));}
-		   
-		   }
-		   }
-	
-		  
-	
+                    //	System.out.println(inputTextParanthesisRemoved);
 
+                    //   Pattern pattern = Pattern.compile("([\\w']+)");
+                    //dns43: stores each leftover "word/expression"  to List Unigrams and LinkedHashSet UniqueWords
+                    Pattern pattern = Pattern.compile("(\\w+)\\s+");
+                    Matcher matcher = pattern.matcher(inputTextParanthesisRemoved);
+                    while (matcher.find()) {
+                        unigrams.add(matcher.group());
+                    }
+                    while (matcher.find()) {
+                        //dns43: store group 1 to LinkedHashSet
+                        //dns43: this is never used
+                        uniqueWords.add(matcher.group(1));
+                    }
+            }
+        }
+        
  //   String[] words = uniqueWords.toArray(new String[0]);
         //dns43: iterate over unigrams
 	for(int i=1; i<unigrams.size(); i++){
 	   //   System.out.println( unigrams.get(i-1));
-                   //dns43: get two subsequent unigrams and write them to a LinkedHashset
-                   //dnsr43: writing them to a hashset assures they are uniqu
-		   bigrams.add(unigrams.get(i-1).trim() + " "+unigrams.get(i).trim());
-                   //dns43: convert to a String
-		       uniquebigrams = bigrams.toArray(new String[bigrams.size()]);
+            //dns43: get two subsequent unigrams and write them to a LinkedHashset
+            //dnsr43: writing them to a hashset assures they are unique
+            bigrams.add(unigrams.get(i-1).trim() + " "+unigrams.get(i).trim());
+            //dns43: convert to a String
+            uniquebigrams = bigrams.toArray(new String[bigrams.size()]);
 	}	
-/*	for(int i=1; i<uniquebigrams.length; i++){
-			System.out.println(uniquebigrams[i]);		
-	}*/
+        //dns43: return unique bigrams whoop whoop
     return uniquebigrams;
     }
     
+
+    //dns43: returns an array of all unique subsequent unigrams
+    //dns43: found in every very first dep line of a function <- why only that line
+    //dns43: parameter is the path "../astfiles/" where .dep, .ast, .js, .txt are stored
+    public static String [] getJSASTNodeBigrams(String dirPath) throws IOException{
+     
+        //dns43: test_file_paths holds paths to all .dep files in that specific folder (LIST in case author has multiple programs)
+        List test_file_paths = Util.listDepFiles(dirPath);
+        //dns43: uniqueWords is never used
+	List<String> unigrams = new ArrayList<String>();
+	Set<String> bigrams = new LinkedHashSet<String>();
+	String[] uniquebigrams = null;
+	
+          //JS Paranthesises      
+//        {
+//            "type": "Punctuator",
+//            "value": "{"
+//        },
+//       {
+//            "type": "Punctuator",
+//            "value": "}"
+//        },                
+//        {
+//            "type": "Punctuator",
+//            "value": "("
+//        },    
+//        {
+//            "type": "Punctuator",
+//            "value": ")"
+//        },
+//                {
+//            "type": "Punctuator",
+//            "value": "["
+//        },
+//                {
+//            "type": "Punctuator",
+//            "value": "]"
+//        },
+//        {
+//            "type": "Punctuator",
+//            "value": ";"
+//        },
+
+	    for(int i=0; i< test_file_paths.size(); i++){
+                    String filePath = test_file_paths.get(i).toString();  
+                    //dns43: testing purpose; we shoud discuss if we use file types .ast/.dep or .txt
+                    filePath = "C:\\Users\\dns43\\Documents\\NetBeansProjects\\CodeStylometry\\testJS\\js_ast.txt";
+                    String inputText =Util.readFile(filePath);
+                    String[] lines = inputText.split("\n");
+                    
+                    for(int l = 0; l<lines.length; l++){
+                        if(lines[l].contains("type")){
+                              lines[l] = lines[l].replaceAll( " ","");
+                              lines[l] = lines[l].replace("\"", "");
+                              lines[l] = lines[l].replace(":", "");
+                              lines[l] = lines[l].replace("type", "");
+                              lines[l] = lines[l].replace(",", "");
+                              unigrams.add(lines[l]);
+                        }
+                    }
+                    for(int j = 1; j<unigrams.size(); j++){
+                        bigrams.add(unigrams.get(j-1)+" "+unigrams.get(j));
+                    }
+	   }
+       uniquebigrams = bigrams.toArray(new String[bigrams.size()]);
+       return uniquebigrams;
+}
+    public static float [] getJSASTNodeBigramsTF (String featureText, String[] ASTNodeBigrams) throws IOException
+    {
+                    String[] lines = featureText.split("\n");
+                    List<String> unigrams = new ArrayList<String>();
+                    String unigramsS = null;
+                    float [] counter = new float[ASTNodeBigrams.length];
+                    
+	System.out.println("AAAAH");
+                    for(int l = 0; l<lines.length; l++){
+                        if(lines[l].contains("type")){
+                              lines[l] = lines[l].replaceAll( " ","");
+                              lines[l] = lines[l].replace("\"", "");
+                              lines[l] = lines[l].replace(":", "");
+                              lines[l] = lines[l].replace("type", "");
+                              lines[l] = lines[l].replace(",", "");
+                              unigrams.add(lines[l]);
+                        }
+                    }
+                    //unigramsS = unigrams.toArray(new String[unigrams.size()]).toString();
+                    //String u = unigrams.toString().replaceAll("\[","");
+                    //u = unigrams.toString().replaceAll("\]","");
+                   String u ="";
+                    for(int i = 0; i< unigrams.size(); i++){
+                        u = u.concat(" "+unigrams.get(i));
+                    }
+                    System.out.println(u);
+                    //for(int j = 1; j<unigrams.size(); j++){
+                        for(int i = 0; i<ASTNodeBigrams.length;i++){
+                        System.out.println("unigram: "+ASTNodeBigrams[i]);
+                        counter[i] = StringUtils.countMatches(u, ASTNodeBigrams[i]); 
+                        System.out.println("#: "+counter[i]);
+                      //  }
+                        //System.out.println(ASTNodeBigrams[j] + " appearance: "+counter[j]); 
+                    }
+	return counter;
+   
+    }
     
+    
+    /*
+    public static float [] getJSASTNodeBigramsTF (String featureText, String[] ASTNodeBigrams) throws IOException
+    {
+        float symbolCount = ASTNodeBigrams.length;
+        float [] counter = new float[(int) symbolCount];
+    	String[] lines = featureText.split("\n");
+                    for(int l = 0; l<lines.length; l++){
+                        if(lines[l].contains("type")){
+                              lines[l] = lines[l].replaceAll( " ","");
+                              lines[l] = lines[l].replace("\"", "");
+                              lines[l] = lines[l].replace(":", "");
+                              lines[l] = lines[l].replace("type", "");
+                              lines[l] = lines[l].replace(",", "");
+                              //unigrams.add(lines[l]);
+                        
+                        for (int i=0; i<symbolCount; i++){
+				//    	featureText remove paranthesis and replace with one space for feature text
+				String str = ASTNodeBigrams[i].toString();
+				//if case insensitive, make lowercase
+				//   strcounter = StringUtils.countMatches(featureText.toLowerCase(), str);
+				counter[i] = StringUtils.countMatches(lines[l], str); 
+                                System.out.println(ASTNodeBigrams[i] + " appearance: "+counter[i]);
+                    }
+                        }
+                    }
+                    
+	    return counter;
+    }
+    */
     public static float [] getASTNodeBigramsTF (String featureText, String[] ASTNodeBigrams ) throws IOException
     {    
     	float symbolCount = ASTNodeBigrams.length;
@@ -210,8 +334,7 @@ public class BigramExtractor {
 				String str = ASTNodeBigrams[i].toString();
 				//if case insensitive, make lowercase
 				//   strcounter = StringUtils.countMatches(featureText.toLowerCase(), str);
-				counter[i] = StringUtils.countMatches(inputTextParanthesisRemoved, str);  	   
- 	 
+				counter[i] = StringUtils.countMatches(inputTextParanthesisRemoved, str);
     }
     }  
 	    return counter;
